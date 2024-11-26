@@ -16,14 +16,20 @@ def draw_on_image(original_image, depth, cls_name=None, conf=None, bound=None):
         pt1 = (int(bound[0]), int(bound[1]))  # Top-left corner
         pt2 = (int(bound[2]), int(bound[3]))  # Bottom-right corner
         cv2.rectangle(original_image, pt1, pt2, (255, 0, 0), 2)
+        text_x = int(bound[0])
+        text_y = int(bound[1] - 5 if bound[1] - 5 > 10 else bound[1] + 20)
+    else:
+        height, width, _ = original_image.shape
+        text_x = int(width // 2)
+        text_y = int(height // 2)
 
-    text_x = int(bound[0])
-    text_y = int(bound[1] - 5 if bound[1] - 5 > 10 else bound[1] + 20)
+
     font = cv2.FONT_HERSHEY_SIMPLEX
     if cls_name and conf:
         label = f"{cls_name} {conf:.2f} | {depth}m"
     else:
-        label = "{depth}m"
+        label = f"{depth}m"
+    
     cv2.putText(
         original_image,
         label,
@@ -43,15 +49,18 @@ def evaluate_yolo(batch, output_folder, data_rows):
 
         detection = results[i]
 
+        new_row = {"File": file_name, "Classes(score/distance)": ""}
+
         if len(detection.boxes) == 0:
-            image = cv2.imread(batch[i])
-            height, width, _ = image.shape
-            center_distance = depth_array[height // 2, width // 2]
+            height, width, _ = original_image.shape
+            center_distance = round(float(depth_array[height // 2, width // 2]))
             draw_on_image(original_image, center_distance)
+            new_row["Classes(score/distance)"] += f"None({center_distance}m)"
+            excel_rows.append(new_row)
             cv2.imwrite(eval_img_path, original_image)
             continue
 
-        new_row = {"File": file_name, "Classes(score/distance)": ""}
+        
         for box in detection.boxes:
             cls = int(box.cls[0])
             cls_name = detection.names[cls]
