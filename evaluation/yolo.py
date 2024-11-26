@@ -13,8 +13,8 @@ def draw_on_image(original_image, depth, cls_name=None, conf=None, bound=None):
     if bound:
         cv2.rectangle(original_image, bound[0], bound[1], (255, 0, 0), 2)
 
-    text_x = bound[0][0]
-    text_y = bound[0][1] - 5 if bound[0][1] - 5 > 10 else bound[0][1] + 20
+    text_x = bound[0]
+    text_y = bound[1] - 5 if bound[1] - 5 > 10 else bound[1] + 20
     font = cv2.FONT_HERSHEY_SIMPLEX
     if cls_name and conf:
         label = f"{cls_name} {conf:.2f} | {depth}m"
@@ -48,8 +48,10 @@ def evaluate_yolo(batch, output_folder, data_rows):
             draw_on_image(original_image, center_distance)
             continue
 
-        detection.save()
-
+        for box in detection.boxes:
+            cls = int(box.cls[0])
+            cls_name = detection.names[cls]
+            xyxy = list(box.xyxy[0])
 
 
 
