@@ -1,3 +1,6 @@
 [submodule "library/ml-depth-pro"]
 	path = library/ml-depth-pro
 	url = https://github.com/apple/ml-depth-pro.git
+[submodule "library/detectron2"]
+	path = library/detectron2
+	url = https://github.com/facebookresearch/detectron2.git
