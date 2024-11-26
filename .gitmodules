@@ -1,0 +1,3 @@
+[submodule "library/ml-depth-pro"]
+	path = library/ml-depth-pro
+	url = https://github.com/apple/ml-depth-pro.git
