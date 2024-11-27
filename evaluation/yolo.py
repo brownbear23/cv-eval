@@ -7,38 +7,12 @@ import pandas as pd
 import os
 import cv2
 import numpy as np
+from img_drawer import draw_on_image
 
 MODEL = "../library/yolo-weights/yolo11m.pt"
 
 
-def draw_on_image(original_image, depth, cls_name=None, conf=None, bound=None):
-    if bound:
-        pt1 = (int(bound[0]), int(bound[1]))  # Top-left corner
-        pt2 = (int(bound[2]), int(bound[3]))  # Bottom-right corner
-        cv2.rectangle(original_image, pt1, pt2, (255, 0, 0), 2)
-        text_x = int(bound[0])
-        text_y = int(bound[1] - 5 if bound[1] - 5 > 10 else bound[1] + 20)
-    else:
-        height, width, _ = original_image.shape
-        text_x = int(width // 2)
-        text_y = int(height // 2)
-
-
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    if cls_name and conf:
-        label = f"{cls_name} {conf:.2f} | {depth}m"
-    else:
-        label = f"{depth}m"
-    
-    cv2.putText(
-        original_image,
-        label,
-        (text_x, text_y),
-        font,
-        0.8, (0, 255, 0), 2)
-
-
-def evaluate_yolo(batch, output_folder, data_rows):
+def evaluate_yolo(batch, output_folder, excel_data):
     model = YOLO(MODEL)
     results = model(batch)
     for i in range(len(batch)):
@@ -55,12 +29,11 @@ def evaluate_yolo(batch, output_folder, data_rows):
             height, width, _ = original_image.shape
             center_distance = round(float(depth_array[height // 2, width // 2]))
             draw_on_image(original_image, center_distance)
-            new_row["Classes(score/distance)"] += f"None({center_distance}m)"
-            excel_rows.append(new_row)
             cv2.imwrite(eval_img_path, original_image)
+            new_row["Classes(score/distance)"] += f"None({center_distance}m)"
+            excel_data.append(new_row)
             continue
 
-        
         for box in detection.boxes:
             cls = int(box.cls[0])
             cls_name = detection.names[cls]
@@ -72,14 +45,15 @@ def evaluate_yolo(batch, output_folder, data_rows):
             new_row["Classes(score/distance)"] += f"{cls_name}({score:.2f}/{depth_value}m),  "
             draw_on_image(original_image, depth_value, cls_name, score, bound)
         new_row["Classes(score/distance)"] = new_row["Classes(score/distance)"][:-3]
-        excel_rows.append(new_row)
+        excel_data.append(new_row)
         cv2.imwrite(eval_img_path, original_image)
 
 
 frame_dir = "../media/frames"
 output_dir = "../outputs/yolo"
-os.makedirs(output_dir, exist_ok=True)
 excel_rows = []
+
+os.makedirs(output_dir, exist_ok=True)
 for directory in os.listdir(frame_dir):
     frame_folder = os.path.join(frame_dir, directory)
     if os.path.isdir(frame_folder):
