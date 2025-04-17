@@ -9,8 +9,7 @@ import cv2
 import numpy as np
 from media_processing.drawer.img_drawer import draw_on_image
 
-MODEL = "../library/yolo-weights/yolo11m.pt"
-
+MODEL = "../library/yolo11m-weights/yolo11m.pt"
 
 def evaluate_yolo(batch, output_folder, excel_data):
     model = YOLO(MODEL)
@@ -50,7 +49,7 @@ def evaluate_yolo(batch, output_folder, excel_data):
 
 
 frame_dir = "../media/frames"
-output_dir = "../outputs/yolo"
+output_dir = "../outputs/yolo11m"
 excel_rows = []
 
 os.makedirs(output_dir, exist_ok=True)
@@ -72,4 +71,4 @@ for directory in os.listdir(frame_dir):
         evaluate_yolo(valid_batch, output_img_folder, excel_rows)
 
 df = pd.DataFrame(excel_rows)
-df.to_excel(os.path.join(output_dir, "yolo_eval.xlsx"), index=False)
+df.to_excel(os.path.join(output_dir, "yolo_eval11m.xlsx"), index=False)

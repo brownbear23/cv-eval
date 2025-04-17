@@ -43,10 +43,13 @@ def extract_frames(video_path, output_path, frame_interval=1):
 
 in_video_directory = "../media/videos"
 out_frame_directory = "../media/frames"
+frame_interval_sec = 1
+
+
 count = 1
 for filename in os.listdir(in_video_directory):
     video_path = os.path.join(in_video_directory, filename)
     if os.path.isfile(video_path):
         print(count, "-", filename)
-        extract_frames(video_path, out_frame_directory, frame_interval=1) # Split every second
+        extract_frames(video_path, out_frame_directory, frame_interval=frame_interval_sec) # Split every second
         count+=1
