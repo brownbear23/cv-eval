@@ -5,10 +5,13 @@ import numpy as np
 import torch
 from media_processing.drawer.img_drawer import draw_on_image
 
-from detectron2.engine import DefaultPredictor
+# For setup
 from detectron2.config import get_cfg
 from detectron2 import model_zoo
-from detectron2.data import MetadataCatalog
+
+# For inference
+from detectron2.engine import DefaultPredictor
+from detectron2.data import MetadataCatalog # Holds class names and color mappings for each dataset
 
 # -------------------------------------------------------------------------------------
 # Detectron2 Installation Guide:

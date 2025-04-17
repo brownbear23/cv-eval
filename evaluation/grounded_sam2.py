@@ -35,7 +35,9 @@ from media_processing.drawer.img_drawer import draw_on_image
 # 🚫 If you do not need segmentation (only bounding boxes), this submodule is not necessary.
 # -------------------------------------------------------------------------------------
 
-def evaluate_SAM(image_dir, output_img_dir, excel_data, device_used="cuda"):
+def evaluate_SAM(image_dir, output_img_dir, excel_data):
+    device_used = "cuda" if torch.cuda.is_available() else "cpu"
+
     if device_used == "cuda":
         torch.cuda.empty_cache()
         torch.cuda.set_per_process_memory_fraction(0.8)
@@ -106,7 +108,6 @@ output_dir = "../outputs/GroundedSAM"
 os.makedirs(output_dir, exist_ok=True)
 excel_rows = []
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
 
 for folder in os.listdir(frame_dir):
     folder_path = os.path.join(frame_dir, folder)
@@ -118,7 +119,7 @@ for folder in os.listdir(frame_dir):
         for fname in os.listdir(folder_path):
             if fname.endswith("jpg"):
                 img_path = os.path.join(folder_path, fname)
-                evaluate_SAM(img_path, out_folder, excel_rows, device)
+                evaluate_SAM(img_path, out_folder, excel_rows)
 
 df = pd.DataFrame(excel_rows)
 df.to_excel(os.path.join(output_dir, "SAM2_eval2.xlsx"), index=False)
