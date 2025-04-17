@@ -1,6 +1,18 @@
+# Ignore Python cache files
 .idea
 .DS_Store
-media/
-outputs/
+
+# Ignore all weight folders
 library/yolo-weights/*
 !library/yolo-weights/.gitkeep
+
+# Ignore media folder containing:
+#   - /videos/: contains 20 original videos (10 objects w 2 different lighting condtions)
+#   - /frames/{object_name}/: contains 20 {object_name} folders containing frames (1s interval) & corresponding depth map
+media/
+
+# Ignore output folder containing:
+#   - /{model_name}/{object}-distance-{lighting}/: contains annotated frames
+#   - /{model_name}/{model_name}_eval.xlsx: excel file with output result
+outputs/
+
