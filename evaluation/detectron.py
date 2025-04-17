@@ -14,7 +14,7 @@ from img_drawer import draw_on_image
 # sudo apt-get update && sudo apt-get install -y ca-certificates
 
 
-def setup_detectron2(device="cuda", score_threshold=0.5):
+def setup_detectron2(device="cuda", score_threshold=0.0):
     cfg = get_cfg()
     cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"))
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml")
