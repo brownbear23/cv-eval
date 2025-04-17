@@ -7,8 +7,7 @@ from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
 from detectron2 import model_zoo
 from detectron2.data import MetadataCatalog
-from img_drawer import draw_on_image
-
+from media_processing.drawer.img_drawer import draw_on_image
 
 # /Applications/Python\ 3.x/Install\ Certificates.command
 # sudo apt-get update && sudo apt-get install -y ca-certificates

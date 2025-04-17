@@ -7,7 +7,7 @@ import pandas as pd
 import os
 import cv2
 import numpy as np
-from img_drawer import draw_on_image
+from media_processing.drawer.img_drawer import draw_on_image
 
 MODEL = "../library/yolo-weights/yolo11m.pt"
 

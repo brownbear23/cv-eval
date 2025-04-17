@@ -1,5 +1,3 @@
-# MOVE TO /workspace/cv-eval/library/Grounded-SAM-2/
-
 from PIL import Image, ImageDraw, ImageFont
 
 def draw_on_image(original_image, depth, cls_name=None, conf=None, bound=None):

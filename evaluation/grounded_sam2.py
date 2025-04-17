@@ -22,6 +22,7 @@ from dds_cloudapi_sdk import DetectionModel
 from dds_cloudapi_sdk import DetectionTarget
 from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection 
 from torch.nn import DataParallel
+from media_processing.drawer.img_drawer import draw_on_image
 
 
 
