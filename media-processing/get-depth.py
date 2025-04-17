@@ -43,10 +43,10 @@ custom_config = DepthProConfig(
     use_fov_head=True,
     fov_encoder_preset="dinov2l16_384",
 )
-frame_directory = "../media/frames"
+in_frame_directory = "../media/frames"
 
-for directory in os.listdir(frame_directory):
-    frame_folder = os.path.join(frame_directory, directory)
+for directory in os.listdir(in_frame_directory):
+    frame_folder = os.path.join(in_frame_directory, directory)
     if os.path.isdir(frame_folder):
         print("Processing folder:", directory)
         for filename in os.listdir(frame_folder):
