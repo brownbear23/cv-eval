@@ -7,12 +7,12 @@ import pandas as pd
 import os
 import cv2
 import numpy as np
-from media_processing.drawer.img_drawer import draw_on_image
+from src.frame_processing.drawer.img_drawer import draw_on_image
+from src.util.eval_util import has_quality
 
-MODEL = "../library/yolo11m-weights/yolo11m.pt"
 
-def evaluate_yolo(batch, output_folder, excel_data):
-    model = YOLO(MODEL)
+def run_yolo(batch, output_folder, excel_data, model_weight_dir):
+    model = YOLO(model_weight_dir)
     results = model(batch)
     for i in range(len(batch)):
         file_name = os.path.basename(batch[i])
@@ -48,27 +48,26 @@ def evaluate_yolo(batch, output_folder, excel_data):
         cv2.imwrite(eval_img_path, original_image)
 
 
-frame_dir = "../media/frames"
-output_dir = "../outputs/yolo11m"
-excel_rows = []
+def evaluate_yolo(frame_dir="../../media/frames", output_dir="../../outputs/yolo11m", model_weight_dir="../../library/yolo11m-weights/yolo11m.pt"):
+    excel_rows = []
+    os.makedirs(output_dir, exist_ok=True)
+    for directory in os.listdir(frame_dir):
+        frame_folder = os.path.join(frame_dir, directory)
+        if os.path.isdir(frame_folder):
+            print("Processing folder:", directory)
 
-os.makedirs(output_dir, exist_ok=True)
-for directory in os.listdir(frame_dir):
-    frame_folder = os.path.join(frame_dir, directory)
-    if os.path.isdir(frame_folder):
-        print("Processing folder:", directory)
+            output_img_folder = os.path.join(output_dir, directory)
+            os.makedirs(output_img_folder, exist_ok=True)
 
-        output_img_folder = os.path.join(output_dir, directory)
-        os.makedirs(output_img_folder, exist_ok=True)
+            valid_batch = [
+                os.path.join(frame_folder, filename)
+                for filename in os.listdir(frame_folder)
+                if
+                os.path.exists(os.path.join(frame_folder, filename)) and os.path.join(frame_folder, filename).endswith(
+                    "jpg") and has_quality(filename, 0.4)
+            ]
+            run_yolo(valid_batch, output_img_folder, excel_rows, model_weight_dir)
+    df = pd.DataFrame(excel_rows)
+    df.to_excel(os.path.join(output_dir, "yolo11m_eval.xlsx"), index=False)
 
-        valid_batch = [
-            os.path.join(frame_folder, filename)
-            for filename in os.listdir(frame_folder)
-            if os.path.exists(os.path.join(frame_folder, filename)) and os.path.join(frame_folder, filename).endswith(
-                "jpg")
-        ]
 
-        evaluate_yolo(valid_batch, output_img_folder, excel_rows)
-
-df = pd.DataFrame(excel_rows)
-df.to_excel(os.path.join(output_dir, "yolo_eval11m.xlsx"), index=False)

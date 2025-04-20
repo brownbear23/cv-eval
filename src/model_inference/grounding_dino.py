@@ -4,7 +4,9 @@ import numpy as np
 from PIL import Image
 import pandas as pd
 from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection
-from media_processing.drawer.img_drawer import draw_on_image
+from src.frame_processing.drawer.img_drawer import draw_on_image
+from src.util.eval_util import has_quality
+
 
 # -------------------------------------------------------------------------------------
 # Grounded SAM2 Submodule Requirement
@@ -35,7 +37,7 @@ from media_processing.drawer.img_drawer import draw_on_image
 # 🚫 If you do not need segmentation (only bounding boxes), this submodule is not necessary.
 # -------------------------------------------------------------------------------------
 
-def evaluate_SAM(image_dir, output_img_dir, excel_data):
+def run_grounding_dino(image_dir, output_img_dir, excel_data):
     device_used = "cuda" if torch.cuda.is_available() else "cpu"
 
     if device_used == "cuda":
@@ -103,23 +105,23 @@ def evaluate_SAM(image_dir, output_img_dir, excel_data):
 
 
 # === Run over all images ===
-frame_dir = "../media/frames"
-output_dir = "../outputs/GroundedSAM"
-os.makedirs(output_dir, exist_ok=True)
-excel_rows = []
+def evaluate_grounding_dino(frame_dir="../../media/frames", output_dir="../../outputs/grounding_dino_tiny"):
+
+    os.makedirs(output_dir, exist_ok=True)
+    excel_rows = []
 
 
-for folder in os.listdir(frame_dir):
-    folder_path = os.path.join(frame_dir, folder)
-    if os.path.isdir(folder_path):
-        print("Processing:", folder)
-        out_folder = os.path.join(output_dir, folder)
-        os.makedirs(out_folder, exist_ok=True)
+    for folder in os.listdir(frame_dir):
+        folder_path = os.path.join(frame_dir, folder)
+        if os.path.isdir(folder_path):
+            print("Processing folder:", folder)
+            out_folder = os.path.join(output_dir, folder)
+            os.makedirs(out_folder, exist_ok=True)
 
-        for fname in os.listdir(folder_path):
-            if fname.endswith("jpg"):
-                img_path = os.path.join(folder_path, fname)
-                evaluate_SAM(img_path, out_folder, excel_rows)
+            for fname in os.listdir(folder_path):
+                if fname.endswith("jpg") and has_quality(fname, 0.4):
+                    img_path = os.path.join(folder_path, fname)
+                    run_grounding_dino(img_path, out_folder, excel_rows)
 
-df = pd.DataFrame(excel_rows)
-df.to_excel(os.path.join(output_dir, "SAM2_eval2.xlsx"), index=False)
+    df = pd.DataFrame(excel_rows)
+    df.to_excel(os.path.join(output_dir, "grounding_dino_tiny_eval.xlsx"), index=False)

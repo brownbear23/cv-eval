@@ -3,7 +3,7 @@ import cv2
 import pandas as pd
 import numpy as np
 import torch
-from media_processing.drawer.img_drawer import draw_on_image
+from src.frame_processing.drawer.img_drawer import draw_on_image
 
 # For setup
 from detectron2.config import get_cfg
@@ -12,6 +12,9 @@ from detectron2 import model_zoo
 # For inference
 from detectron2.engine import DefaultPredictor
 from detectron2.data import MetadataCatalog # Holds class names and color mappings for each dataset
+
+from src.util.eval_util import has_quality
+
 
 # -------------------------------------------------------------------------------------
 # Detectron2 Installation Guide:
@@ -58,7 +61,7 @@ def setup_detectron2(device="cuda", score_threshold=0.0):
     return cfg
 
 
-def evaluate_detectron2(cfg_in, image_dir, output_img_dir, excel_data, device_used="cuda"):
+def run_detectron2(cfg_in, image_dir, output_img_dir, excel_data, device_used="cuda"):
     predictor = DefaultPredictor(cfg_in)
 
     # Load image
@@ -66,7 +69,7 @@ def evaluate_detectron2(cfg_in, image_dir, output_img_dir, excel_data, device_us
     file_name = os.path.basename(image_dir)
     eval_img_path = str(os.path.join(output_img_dir, file_name))
 
-    # Load depth array
+    # Load frame_analysis array
     depth_array = np.load(os.path.splitext(image_dir)[0] + "_depth.npy")
     depth_tensor = torch.tensor(depth_array, device=device_used)  # Move to GPU
 
@@ -114,26 +117,25 @@ def evaluate_detectron2(cfg_in, image_dir, output_img_dir, excel_data, device_us
     cv2.imwrite(eval_img_path, image)
 
 
-frame_dir = "../media/frames"
-output_dir = "../outputs/detectron2"
-os.makedirs(output_dir, exist_ok=True)
-excel_rows = []
+def evaluate_detectron2(frame_dir="../../media/frames", output_dir="../../outputs/detectron2"):
+    os.makedirs(output_dir, exist_ok=True)
+    excel_rows = []
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    cfg = setup_detectron2(device=device)
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-cfg = setup_detectron2(device=device)
+    for directory in os.listdir(frame_dir):
+        frame_folder = os.path.join(frame_dir, directory)
+        if os.path.isdir(frame_folder):
+            print("Processing folder:", directory)
 
-for directory in os.listdir(frame_dir):
-    frame_folder = os.path.join(frame_dir, directory)
-    if os.path.isdir(frame_folder):
-        print("Processing folder:", directory)
+            output_img_folder = os.path.join(output_dir, directory)
+            os.makedirs(output_img_folder, exist_ok=True)
 
-        output_img_folder = os.path.join(output_dir, directory)
-        os.makedirs(output_img_folder, exist_ok=True)
+            for filename in os.listdir(frame_folder):
+                if (os.path.exists(os.path.join(frame_folder, filename)) and os.path.join(frame_folder, filename).endswith("jpg")
+                        and has_quality(filename, 0.4)):
+                    image_path = os.path.join(frame_folder, filename)
+                    run_detectron2(cfg, image_path, output_img_folder, excel_rows, device)
 
-        for filename in os.listdir(frame_folder):
-            if os.path.exists(os.path.join(frame_folder, filename)) and os.path.join(frame_folder, filename).endswith("jpg"):
-                image_path = os.path.join(frame_folder, filename)
-                evaluate_detectron2(cfg, image_path, output_img_folder, excel_rows, device)
-
-df = pd.DataFrame(excel_rows)
-df.to_excel(os.path.join(output_dir, "detectron2_eval.xlsx"), index=False)
+    df = pd.DataFrame(excel_rows)
+    df.to_excel(os.path.join(output_dir, "detectron2_eval.xlsx"), index=False)
