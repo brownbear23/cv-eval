@@ -35,15 +35,21 @@ MODEL = Models.YOLO
 def detect_objects(model_type: Models, frame_dir, result_dir):
     if model_type == Models.YOLO:
         print("YOLO11m")
-        evaluate_yolo11m(frame_dir=frame_dir, output_dir=os.path.join(result_dir, "yolo11m"),
-                         model_weight_dir="./library/yolo-weights/yolo11m.pt")
+        eval_ret = evaluate_yolo11m(frame_dir=frame_dir, output_dir=os.path.join(result_dir, "yolo11m"),
+                                    model_weight_dir="./library/yolo-weights/yolo11m.pt")
+        if not eval_ret:
+            sys.exit("Stopping script due to condition.")
     elif model_type == Models.DETECTRON2:
         # Installation guide at detectron2.py
         print("Detectron2")
-        evaluate_detectron2(frame_dir=frame_dir, output_dir=(result_dir+"detectron2"))
+        eval_ret = evaluate_detectron2(frame_dir=frame_dir, output_dir=os.path.join(result_dir, "detectron2"))
+        if not eval_ret:
+            sys.exit("Stopping script due to condition.")
     elif model_type == Models.GROUNDING_DINO:
         print("grounding_dino_tiny")
-        evaluate_grounding_dino_tiny(frame_dir=frame_dir, output_dir=(result_dir + "grounding_dino_tiny"))
+        eval_ret = evaluate_grounding_dino_tiny(frame_dir=frame_dir, output_dir=os.path.join(result_dir, "grounding_dino_tiny"))
+        if not eval_ret:
+            sys.exit("Stopping script due to condition.")
     elif model_type == Models.gpt_o4:
         print("gpt_o4")
         evaluate_gpt4o(frame_dir=frame_dir, output_dir=(result_dir+"grounding_dino_tiny"))

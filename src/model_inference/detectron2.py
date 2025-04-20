@@ -117,7 +117,13 @@ def run_detectron2(cfg_in, image_dir, output_img_dir, excel_data, device_used="c
     cv2.imwrite(eval_img_path, image)
 
 
-def evaluate_detectron2(frame_dir="../../media/frames", output_dir="../../outputs/detectron2"):
+def evaluate_detectron2(frame_dir="../../media/frames_scores", output_dir="../../outputs/detectron2"):
+    if os.path.isdir(output_dir):
+        print(f"WARNING: \"{output_dir}\" directory exists\nDelete the directory to run\nExiting...")
+        return False
+
+
+
     os.makedirs(output_dir, exist_ok=True)
     excel_rows = []
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -139,3 +145,5 @@ def evaluate_detectron2(frame_dir="../../media/frames", output_dir="../../output
 
     df = pd.DataFrame(excel_rows)
     df.to_excel(os.path.join(output_dir, "detectron2_eval.xlsx"), index=False)
+
+    return True

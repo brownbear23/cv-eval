@@ -48,7 +48,11 @@ def run_yolo(batch, output_folder, excel_data, model_weight_dir):
         cv2.imwrite(eval_img_path, original_image)
 
 
-def evaluate_yolo11m(frame_dir="../../media/frames", output_dir="../../outputs/yolo11m", model_weight_dir="../../library/yolo11m-weights/yolo11m.pt"):
+def evaluate_yolo11m(frame_dir="../../media/frames_scores", output_dir="../../outputs/yolo11m", model_weight_dir="../../library/yolo11m-weights/yolo11m.pt"):
+    if os.path.isdir(output_dir):
+        print(f"WARNING: \"{output_dir}\" directory exists\nDelete the directory to run\nExiting...")
+        return False
+
     excel_rows = []
     os.makedirs(output_dir, exist_ok=True)
     for directory in os.listdir(frame_dir):
@@ -69,5 +73,7 @@ def evaluate_yolo11m(frame_dir="../../media/frames", output_dir="../../outputs/y
             run_yolo(valid_batch, output_img_folder, excel_rows, model_weight_dir)
     df = pd.DataFrame(excel_rows)
     df.to_excel(os.path.join(output_dir, "yolo11m_eval.xlsx"), index=False)
+
+    return True
 
 

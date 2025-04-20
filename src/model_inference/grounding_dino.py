@@ -105,7 +105,11 @@ def run_grounding_dino(image_dir, output_img_dir, excel_data):
 
 
 # === Run over all images ===
-def evaluate_grounding_dino_tiny(frame_dir="../../media/frames", output_dir="../../outputs/grounding_dino_tiny"):
+def evaluate_grounding_dino_tiny(frame_dir="../../media/frames_scores", output_dir="../../outputs/grounding_dino_tiny"):
+    if os.path.isdir(output_dir):
+        print(f"WARNING: \"{output_dir}\" directory exists\nDelete the directory to run\nExiting...")
+        return False
+
 
     os.makedirs(output_dir, exist_ok=True)
     excel_rows = []
@@ -125,3 +129,5 @@ def evaluate_grounding_dino_tiny(frame_dir="../../media/frames", output_dir="../
 
     df = pd.DataFrame(excel_rows)
     df.to_excel(os.path.join(output_dir, "grounding_dino_tiny_eval.xlsx"), index=False)
+
+    return True
