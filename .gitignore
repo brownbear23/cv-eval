@@ -3,12 +3,14 @@
 .DS_Store
 
 # Ignore all weight folders
-library/yolo-weights/*
-!library/yolo-weights/.gitkeep
+library/yolo_weights/*
+!library/yolo_weights/.gitkeep
+library/quality_check/*
+!library/quality_check/.gitkeep
 
 # Ignore media folder containing:
 #   - /videos/: contains 20 original videos (10 objects w 2 different lighting condtions)
-#   - /frames/{object_name}/: contains 20 {object_name} folders containing frames (1s interval) & corresponding depth map
+#   - /frames/{object_name}/: contains 20 {object_name} folders containing frames (1s interval) & corresponding frame_analysis map
 media/
 
 # Ignore output folder containing:
@@ -16,3 +18,12 @@ media/
 #   - /{model_name}/{model_name}_eval.xlsx: excel file with output result
 outputs/
 
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# VS Code, PyCharm, etc.
+*.vscode/
+*.idea/
