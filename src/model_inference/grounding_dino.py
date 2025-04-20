@@ -105,7 +105,7 @@ def run_grounding_dino(image_dir, output_img_dir, excel_data):
 
 
 # === Run over all images ===
-def evaluate_grounding_dino(frame_dir="../../media/frames", output_dir="../../outputs/grounding_dino_tiny"):
+def evaluate_grounding_dino_tiny(frame_dir="../../media/frames", output_dir="../../outputs/grounding_dino_tiny"):
 
     os.makedirs(output_dir, exist_ok=True)
     excel_rows = []

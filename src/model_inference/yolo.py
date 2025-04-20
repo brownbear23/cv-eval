@@ -48,7 +48,7 @@ def run_yolo(batch, output_folder, excel_data, model_weight_dir):
         cv2.imwrite(eval_img_path, original_image)
 
 
-def evaluate_yolo(frame_dir="../../media/frames", output_dir="../../outputs/yolo11m", model_weight_dir="../../library/yolo11m-weights/yolo11m.pt"):
+def evaluate_yolo11m(frame_dir="../../media/frames", output_dir="../../outputs/yolo11m", model_weight_dir="../../library/yolo11m-weights/yolo11m.pt"):
     excel_rows = []
     os.makedirs(output_dir, exist_ok=True)
     for directory in os.listdir(frame_dir):
