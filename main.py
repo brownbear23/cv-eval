@@ -1,62 +1,89 @@
 from enum import Enum
 import torch
 import os
-import cv2
+import sys
 
+from src.model_inference.yolo import evaluate_yolo
+from model_inference.detectron2 import evaluate_detectron2
+from src.model_inference.grounding_dino import evaluate_grounding_dino
+from src.frame_processing.frame_splitter import slice_video_to_frames
+from src.frame_analysis.biqa.process_quality import evaluate_quality
+from src.frame_analysis.depth_pro.get_depth import eval_depth
 class Models(Enum):
     YOLO = 1
     DETECTRON2 = 2
-    GROUNDED_SAM2 = 3  # grounding-dino-tiny
+    GROUNDING_DINO = 3  # grounding-dino-tiny
+    gpt_o4 = 3  # grounding-dino-tiny
 
 
 ######## Options
-SLICE_VIDEO = True
-QUALITY_CHECK = True
-DEPTH_CALC = True
-MODEL = Models.GROUNDED_SAM2
+SLICE_VIDEO = False
+QUALITY_CHECK = False
+DEPTH_CALC = False
+MODEL = Models.YOLO
 
-print("PyTorch version:", torch.__version__)
-print("CUDA available:", torch.cuda.is_available())
-print("CUDA version:", torch.version.cuda)
-
+# print("### Machine Spec ###")
+# print("PyTorch version:", torch.__version__)
+# print("CUDA available:", torch.cuda.is_available())
+# print("CUDA version:", torch.version.cuda)
+# print("\n")
 
 
 # --- Model-Specific Detection Functions ---
 
-def detect_objects(image_path, model_type: Models):
+def detect_objects(model_type: Models, frame_dir, result_dir):
     if model_type == Models.YOLO:
-        detect_with_yolo(image_path)
+        print("YOLO11m")
+        evaluate_yolo(frame_dir=frame_dir, output_dir=os.path.join(result_dir, "yolo11m"),
+                      model_weight_dir="./library/yolo-weights/yolo11m.pt")
     elif model_type == Models.DETECTRON2:
-        detect_with_detectron2(image_path)
-    elif model_type == Models.GROUNDED_SAM2:
-        detect_with_grounded_sam2(image_path)
+        # Installation guide at detectron2.py
+        print("Detectron2")
+        evaluate_detectron2(frame_dir=frame_dir, output_dir=(result_dir+"detectron2"))
+    elif model_type == Models.GROUNDING_DINO:
+        print("grounding_dino_tiny")
+        evaluate_grounding_dino(frame_dir=frame_dir, output_dir=(result_dir+"grounding_dino_tiny"))
     else:
         raise ValueError(f"Unsupported model: {model_type}")
 
 
 
 # --- Run Pipeline ---
+'''
+source .venv/bin/activate
+mkdir /workspace/lib/
+export HF_HOME=/workspace/lib/
+or
+export HF_HOME=/Users/billhan/Desktop/Dev/Dir_EVA-CV/lib
 
-VIDEO_PATH = "sample_video.mp4"
-FRAME_DIR = "frames"
+and run 
+
+python -m src.main
+
+'''
+
+IN_VIDEO_PATH = os.path.abspath("./media/videos/")
+OUT_FRAME_DIR = os.path.abspath("./media/frames/")
+OUT_FRAME_SCORE_DIR = os.path.abspath("./media/frames_scores/")
+ML_DEPTH_PRO_CP_DIR = os.path.abspath("./library/ml_depth_pro/checkpoints/depth_pro.pt")
+RESULT_DIR = os.path.abspath("./outputs/")
 
 if SLICE_VIDEO:
-    frame_files = slice_video_to_frames(VIDEO_PATH, FRAME_DIR)
-else:
-    frame_files = sorted(os.listdir(FRAME_DIR))
+    print("### RUNNING: Slicing Video ###")
+    ret = slice_video_to_frames(IN_VIDEO_PATH, OUT_FRAME_DIR, frame_interval_sec=0.25)
+    if not ret:
+        sys.exit("Stopping script due to condition.")
 
-for frame_file in frame_files:
-    frame_path = os.path.join(FRAME_DIR, frame_file)
+if QUALITY_CHECK:
+    print("### RUNNING: Quality Check ###")
+    ret = evaluate_quality(OUT_FRAME_DIR, OUT_FRAME_SCORE_DIR)
+    if not ret:
+        sys.exit("Stopping script due to condition.")
 
-    # Quality Check
-    if QUALITY_CHECK:
-        if not check_image_quality(frame_path):
-            print(f"Skipping {frame_file} due to low quality.")
-            continue
+if DEPTH_CALC:
+    print("### RUNNING: Depth Calculation ###")
+    # Installation guide at get_depth.py
+    eval_depth(OUT_FRAME_SCORE_DIR, ML_DEPTH_PRO_CP_DIR)
 
-    # Depth Calculation
-    if DEPTH_CALC:
-        calculate_depth(frame_path)
-
-    # Object Detection
-    detect_objects(frame_path, MODEL)
+print("### RUNNING: Inference ###")
+detect_objects(MODEL, OUT_FRAME_SCORE_DIR, RESULT_DIR)
