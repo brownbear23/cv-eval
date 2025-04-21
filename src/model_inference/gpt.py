@@ -112,6 +112,9 @@ def run_gpt4o(image_dir, output_img_dir, excel_data, api_key, prompt):
 
 # Run over all images
 def evaluate_gpt4o(api_key, prompt, frame_dir="../../media/frames_scores", output_dir="../../outputs/gpt4o"):
+    if os.path.isdir(output_dir):
+        print(f"WARNING: \"{output_dir}\" directory exists\nDelete the directory to run\nExiting...")
+        return False
     os.makedirs(output_dir, exist_ok=True)
     excel_rows = []
 
@@ -129,3 +132,5 @@ def evaluate_gpt4o(api_key, prompt, frame_dir="../../media/frames_scores", outpu
 
     df = pd.DataFrame(excel_rows)
     df.to_excel(os.path.join(output_dir, "gpt4o_eval.xlsx"), index=False)
+
+    return True
