@@ -112,7 +112,7 @@ def evaluate_detectron2(frame_dir="../../media/frames_scores", output_dir="../..
     os.makedirs(output_dir, exist_ok=True)
     excel_rows = []
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    cfg = setup_detectron2(device=device)
+    cfg = setup_detectron2(device=device, score_threshold=0.01)
 
     for directory in os.listdir(frame_dir):
         frame_folder = os.path.join(frame_dir, directory)
