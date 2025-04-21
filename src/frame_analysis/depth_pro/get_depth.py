@@ -8,7 +8,7 @@ from torch import amp
 from src.util.eval_util import has_quality
 
 '''
-cd library/ml_depth_pro
+cd library/ml-depth-pro
 pip install -e .
 source get_pretrained_models.sh
 '''
@@ -35,16 +35,16 @@ def extract_depth(image_name, image_folder, custom_config):
     depth_input = transform(image).to("cuda" if has_gpu else "cpu")
 
 
-    with autocast(enabled=has_gpu):
+    with amp.autocast("cuda" if has_gpu else "cpu"):
         prediction = depth_model.infer(depth_input, f_px=f_px)
 
-    depth = prediction["frame_analysis"]
+    depth = prediction["depth"]
     depth_np = depth.squeeze().cpu().numpy()  # Convert frame_analysis tensor to NumPy array
 
     save_depth_map(depth_np, image_folder, image_name)
 
 
-def eval_depth(in_frame_dir="../../../media/frames_scores", checkpoint_dir="../../../library/ml_depth_pro/checkpoints/depth_pro.pt"):
+def eval_depth(in_frame_dir="../../../media/frames_scores", checkpoint_dir="../../../library/ml-depth-pro/checkpoints/depth_pro.pt"):
     custom_config = DepthProConfig(
         patch_encoder_preset="dinov2l16_384",
         image_encoder_preset="dinov2l16_384",
