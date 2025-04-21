@@ -37,6 +37,25 @@ from src.util.eval_util import has_quality
 # 🚫 If you do not need segmentation (only bounding boxes), this submodule is not necessary.
 # -------------------------------------------------------------------------------------
 
+def get_prompt(target_obj):
+    prompt_map = {
+        "chair": "chair .",
+        "dining": "dining table .",
+        "potted": "potted plant .",
+        "couch": "couch .",
+        "backpack": "backpack .",
+        "door": "door .",
+        "rolled": "rolled carpet .",
+        "trash": "trash bin .",
+        "shoes": "shoes .",
+        "ladder": "ladder ."
+    }
+    target_obj_lower = target_obj.lower()
+    for keyword, class_idx_lst in prompt_map.items():
+        if keyword in target_obj_lower:
+            return class_idx_lst
+    return None
+
 def run_grounding_dino(image_dir, output_img_dir, excel_data):
     device_used = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -57,7 +76,8 @@ def run_grounding_dino(image_dir, output_img_dir, excel_data):
     processor = AutoProcessor.from_pretrained(model_id)
     model = AutoModelForZeroShotObjectDetection.from_pretrained(model_id).to(device_used)
 
-    text_prompt = "chair . dining table . potted plant . couch . backpack . door . carpet . trash bin . shoes . ladder ."
+    text_prompt = get_prompt(file_name.split('-')[0])
+    # text_prompt = "chair . dining table . potted plant . couch . backpack . door . carpet . trash bin . shoes . ladder ."
     inputs = processor(images=image_pil, text=text_prompt, return_tensors="pt").to(device_used)
 
     with torch.no_grad():

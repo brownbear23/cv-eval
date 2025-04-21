@@ -8,7 +8,7 @@ import os
 import cv2
 import numpy as np
 from src.frame_processing.drawer.img_drawer import draw_on_image
-from src.util.eval_util import has_quality
+from src.util.eval_util import has_quality, get_coco_lst
 
 
 def run_yolo(batch, output_folder, excel_data, model_weight_dir):
@@ -33,17 +33,30 @@ def run_yolo(batch, output_folder, excel_data, model_weight_dir):
             excel_data.append(new_row)
             continue
 
+        acceptable_class_idx_lst = get_coco_lst(file_name.split('-')[0])
+        annotated_cnt = 0
         for box in detection.boxes:
             cls = int(box.cls[0])
-            cls_name = detection.names[cls]
-            score = round(float(box.conf[0]), 2)
-            bound = list(box.xyxy[0])
-            center_y = int((bound[1] + bound[3]) // 2)
-            center_x = int((bound[0] + bound[2]) // 2)
-            depth_value = round(float(depth_array[center_y, center_x]), 2)
-            new_row["Classes(score/distance)"] += f"{cls_name}({score:.2f}/{depth_value}m),  "
-            draw_on_image(original_image, depth_value, cls_name, score, bound)
-        new_row["Classes(score/distance)"] = new_row["Classes(score/distance)"][:-3]
+            if cls in acceptable_class_idx_lst:
+                annotated_cnt += 1
+                cls_name = detection.names[cls]
+                score = round(float(box.conf[0]), 2)
+                bound = list(box.xyxy[0])
+                center_y = int((bound[1] + bound[3]) // 2)
+                center_x = int((bound[0] + bound[2]) // 2)
+                depth_value = round(float(depth_array[center_y, center_x]), 2)
+                new_row["Classes(score/distance)"] += f"{cls_name}({score:.2f}/{depth_value}m),  "
+                draw_on_image(original_image, depth_value, cls_name, score, bound)
+
+        if annotated_cnt > 0:
+            new_row["Classes(score/distance)"] = new_row["Classes(score/distance)"][:-3]
+        else:
+            height, width, _ = original_image.shape
+            center_distance = round(float(depth_array[height // 2, width // 2]))
+            draw_on_image(original_image, center_distance)
+            cv2.imwrite(eval_img_path, original_image)
+            new_row["Classes(score/distance)"] += f"None({center_distance}m)"
+
         excel_data.append(new_row)
         cv2.imwrite(eval_img_path, original_image)
 

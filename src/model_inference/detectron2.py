@@ -96,23 +96,35 @@ def run_detectron2(cfg_in, image_dir, output_img_dir, excel_data, device_used="c
         excel_data.append(new_row)
         return
 
+    acceptable_class_idx_lst = get_coco_lst(file_name.split('-')[0])
+    annotated_cnt = 0
+
     for cls, bound, score in zipped_results:
-        cls_name = metadata.thing_classes[int(cls.item())]
-        score = round(float(score.item()), 2)
-        x1, y1, x2, y2 = bound.tolist()  # Convert tensor to list for drawing
-        center_y = int((y1 + y2) // 2)
-        center_x = int((x1 + x2) // 2)
+        cls = int(cls.item())
+        if cls in acceptable_class_idx_lst:
+            annotated_cnt += 1
+            cls_name = metadata.thing_classes[cls]
+            score = round(float(score.item()), 2)
+            x1, y1, x2, y2 = bound.tolist()  # Convert tensor to list for drawing
+            center_y = int((y1 + y2) // 2)
+            center_x = int((x1 + x2) // 2)
+            # Safeguard against out-of-bounds access
+            try:
+                depth_value = round(float(depth_tensor[center_y, center_x].item()), 2)
+            except IndexError:
+                depth_value = None
+            new_row["Classes(score/distance)"] += f"{cls_name}({score:.2f}/{depth_value}m),  "
+            draw_on_image(image, depth_value, cls_name, score, [x1, y1, x2, y2])
 
-        # Safeguard against out-of-bounds access
-        try:
-            depth_value = round(float(depth_tensor[center_y, center_x].item()), 2)
-        except IndexError:
-            depth_value = None
+    if annotated_cnt > 0:
+        new_row["Classes(score/distance)"] = new_row["Classes(score/distance)"].rstrip(",  ")
+    else:
+        height, width, _ = image.shape
+        center_distance = round(float(depth_array[height // 2, width // 2]))
+        draw_on_image(image, center_distance)
+        cv2.imwrite(eval_img_path, image)
+        new_row["Classes(score/distance)"] += f"None({center_distance}m)"
 
-        new_row["Classes(score/distance)"] += f"{cls_name}({score:.2f}/{depth_value}m),  "
-        draw_on_image(image, depth_value, cls_name, score, [x1, y1, x2, y2])
-
-    new_row["Classes(score/distance)"] = new_row["Classes(score/distance)"].rstrip(",  ")
     excel_data.append(new_row)
     cv2.imwrite(eval_img_path, image)
 
