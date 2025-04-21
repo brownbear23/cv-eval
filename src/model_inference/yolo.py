@@ -26,7 +26,7 @@ def run_yolo(batch, output_folder, excel_data, model_weight_dir):
 
         if len(detection.boxes) == 0:
             height, width, _ = original_image.shape
-            center_distance = round(float(depth_array[height // 2, width // 2]))
+            center_distance = round(float(depth_array[height // 2, width // 2]), 2)
             draw_on_image(original_image, center_distance)
             cv2.imwrite(eval_img_path, original_image)
             new_row["Classes(score/distance)"] += f"None({center_distance}m)"
@@ -52,7 +52,7 @@ def run_yolo(batch, output_folder, excel_data, model_weight_dir):
             new_row["Classes(score/distance)"] = new_row["Classes(score/distance)"][:-3]
         else:
             height, width, _ = original_image.shape
-            center_distance = round(float(depth_array[height // 2, width // 2]))
+            center_distance = round(float(depth_array[height // 2, width // 2]), 2)
             draw_on_image(original_image, center_distance)
             cv2.imwrite(eval_img_path, original_image)
             new_row["Classes(score/distance)"] += f"None({center_distance}m)"

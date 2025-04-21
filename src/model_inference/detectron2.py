@@ -93,7 +93,7 @@ def run_detectron2(cfg_in, image_dir, output_img_dir, excel_data, device_used="c
         new_row["Classes(score/distance)"] = new_row["Classes(score/distance)"].rstrip(",  ")
     else:
         height, width, _ = image.shape
-        center_distance = round(float(depth_array[height // 2, width // 2]))
+        center_distance = round(float(depth_array[height // 2, width // 2]), 2)
         draw_on_image(image, center_distance)
         cv2.imwrite(eval_img_path, image)
         new_row["Classes(score/distance)"] += f"None({center_distance}m)"
