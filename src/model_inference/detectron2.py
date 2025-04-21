@@ -13,43 +13,16 @@ from detectron2 import model_zoo
 from detectron2.engine import DefaultPredictor
 from detectron2.data import MetadataCatalog # Holds class names and color mappings for each dataset
 
-from src.util.eval_util import has_quality
+from src.util.eval_util import has_quality, get_coco_lst
 
+'''
+Detectron2 installation guide: https://github.com/facebookresearch/detectron2/blob/main/INSTALL.md
 
-# -------------------------------------------------------------------------------------
-# Detectron2 Installation Guide:
-#
-# 🖥️ If you are using a **GPU**:
-# Use the official prebuilt wheel from Facebook AI's CDN.
-# Example for CUDA 11.8 and PyTorch 2.1:
-#   pip install detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cu118/torch2.1/index.html
-#
-# ⚠️ IMPORTANT:
-# - Replace `cu118` with your actual CUDA version (e.g., cu117, cu121)
-# - Replace `torch2.1` with your actual PyTorch version (e.g., torch1.13, torch2.0)
-# - You can find the latest links here:
-#   https://detectron2.readthedocs.io/en/latest/tutorials/install.html
-#
-# 🧱 To check your PyTorch and CUDA version:
-#   >>> import torch
-#   >>> print(torch.__version__)
-#   >>> print(torch.version.cuda)
-#   >>> print(torch.cuda.is_available())
-#
-# 🧮 If you are using **CPU only**:
-# Prebuilt wheels are not available — you must build from source:
-#   pip install 'git+https://github.com/facebookresearch/detectron2.git'
-#
-# This will compile Detectron2 using your current environment and allow CPU-only execution.
-#
-# 🛠️ Certificate Fix (Required for some macOS or Linux environments):
-# macOS:
-#   /Applications/Python\ 3.x/Install\ Certificates.command
-#
-# Ubuntu/Debian:
-#   sudo apt-get update && sudo apt-get install -y ca-certificates
-# -------------------------------------------------------------------------------------
+torch `2.2.0+cu118` is the latest version Detectron2 supports.
 
+pip install torch==2.2.0+cu118 torchvision==0.17.0+cu118 torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu118
+python -m pip install -e /workspace/cv-eval/library/detectron2
+'''
 
 
 def setup_detectron2(device="cuda", score_threshold=0.0):
