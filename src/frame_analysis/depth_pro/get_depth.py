@@ -2,8 +2,8 @@ import depth_pro
 from depth_pro.depth_pro import DepthProConfig
 import os
 import numpy as np
-from torch.cuda.amp import autocast
 import torch
+from torch import amp
 
 from src.util.eval_util import has_quality
 

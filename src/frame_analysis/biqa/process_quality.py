@@ -1,14 +1,12 @@
 from torchvision import transforms
 import torch
-from PIL import Image
 from huggingface_hub import hf_hub_download
 import importlib.util
 import numpy as np
 import random
 import os
-from matplotlib import font_manager
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 
 def IQA_init():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

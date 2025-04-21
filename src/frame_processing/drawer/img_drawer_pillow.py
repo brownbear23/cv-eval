@@ -1,4 +1,4 @@
-from PIL import Image, ImageDraw, ImageFont
+from PIL import ImageDraw, ImageFont
 
 def draw_on_image(original_image, depth, cls_name=None, conf=None, bound=None):
     """
