@@ -143,7 +143,7 @@ def evaluate_grounding_dino_tiny(frame_dir="../../media/frames_scores", output_d
             os.makedirs(out_folder, exist_ok=True)
 
             for fname in os.listdir(folder_path):
-                if fname.endswith("jpg") and has_quality(fname, 0.4):
+                if fname.endswith("jpg") and has_quality(fname, 0.0):
                     img_path = os.path.join(folder_path, fname)
                     run_grounding_dino(img_path, out_folder, excel_rows)
 

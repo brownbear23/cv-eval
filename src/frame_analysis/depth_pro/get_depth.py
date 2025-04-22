@@ -8,7 +8,7 @@ from torch import amp
 from src.util.eval_util import has_quality
 
 '''
-cd library/ml-depth-pro
+cd /workspace/cv-eval/library/ml-depth-pro
 pip install -e .
 source get_pretrained_models.sh
 '''
@@ -60,7 +60,7 @@ def eval_depth(in_frame_dir="../../../media/frames_scores", checkpoint_dir="../.
             print("Processing folder:", directory)
             for filename in os.listdir(frame_folder):
                 if filename.lower().endswith((".jpg", ".jpeg", ".png")):  # Only process images
-                    if has_quality(filename, 0.4):
+                    if has_quality(filename, 0.0):
                         print(f"    Processing: {filename}")
                         extract_depth(filename, frame_folder, custom_config)
                     else:

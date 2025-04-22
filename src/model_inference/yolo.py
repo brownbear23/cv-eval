@@ -81,7 +81,7 @@ def evaluate_yolo11m(frame_dir="../../media/frames_scores", output_dir="../../ou
                 for filename in os.listdir(frame_folder)
                 if
                 os.path.exists(os.path.join(frame_folder, filename)) and os.path.join(frame_folder, filename).endswith(
-                    "jpg") and has_quality(filename, 0.4)
+                    "jpg") and has_quality(filename, 0.0)
             ]
             run_yolo(valid_batch, output_img_folder, excel_rows, model_weight_dir)
     df = pd.DataFrame(excel_rows)
