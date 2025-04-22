@@ -87,13 +87,17 @@ def run_grounding_dino(image_dir, output_img_dir, excel_data):
         outputs,
         inputs.input_ids,
         box_threshold=0.4,
+        # Confidence for bounding boxes
+        # This threshold filters predictions based on the model's confidence scores for detecting the presence of an object within the bounding boxes. scores directly corresponds to this threshold.
         text_threshold=0.3,
+        # Confidence for text labels
+        # Controls the match between the text prompt and the detected object's label. It does not directly relate to the numerical confidence score stored in scores.
         target_sizes=[image_pil.size[::-1]]  # (height, width)
     )
 
     labels = results[0]["labels"]
     boxes = results[0]["boxes"].cpu().numpy()
-    scores = results[0]["scores"].cpu().numpy().tolist()
+    scores = results[0]["scores"].cpu().numpy().tolist() # Confidence for bounding boxes
 
     new_row = {"File": file_name, "Classes(score/distance)": ""}
     if len(labels) == 0:

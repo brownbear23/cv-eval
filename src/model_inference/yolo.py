@@ -13,7 +13,7 @@ from src.util.eval_util import has_quality, get_coco_lst
 
 def run_yolo(batch, output_folder, excel_data, model_weight_dir):
     model = YOLO(model_weight_dir)
-    results = model(batch)
+    results = model(batch, conf=0.01)
     for i in range(len(batch)):
         file_name = os.path.basename(batch[i])
         eval_img_path = str(os.path.join(output_folder, file_name))

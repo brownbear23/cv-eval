@@ -21,8 +21,8 @@ class Models(Enum):
 # --- Options ---
 SLICE_VIDEO = False
 QUALITY_CHECK = False
-DEPTH_CALC = False
-RUN_ALL = False
+DEPTH_CALC = True
+RUN_ALL = True
 MODEL = Models.GPT_O4
 
 OPEN_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -73,15 +73,14 @@ def detect_objects(model_type: Models, frame_dir, result_dir):
 
 # --- Run Pipeline ---
 '''
+mkdir /workspace/lib/
+mkdir /workspace/lib/HF
+mkdir /workspace/lib/PY
+
 python3 -m venv /workspace/cv-eval/venv
 source /workspace/cv-eval/venv/bin/activate  
 pip install --upgrade pip
 pip install -r requirements.txt
-source venv/bin/activate
-
-mkdir /workspace/lib/
-mkdir /workspace/lib/HF
-mkdir /workspace/lib/PY
 
 echo 'export HF_HOME=/workspace/lib/HF' >> ~/.bashrc
 echo 'export PIP_CACHE_DIR=/workspace/lib/PY' >> ~/.bashrc
