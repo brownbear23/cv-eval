@@ -10,14 +10,17 @@ library/quality_check/*
 
 # Ignore media folder containing:
 #   - /videos/: contains 20 original videos (10 objects w 2 different lighting condtions)
-#   - /frames/{object_name}/: contains 20 {object_name} folders containing frames (1s interval) & corresponding frame_analysis map
-media/
+#   - /frames/{object_name}/: contains 20 {object_name} folders containing frames (1s interval) & corresponding frame_analysis map (auto-generated)
+#   - /frames_scores/{object_name}/: quality score is added to the end of the frame name (auto-generated)
+media/*
+media/videos/*
+!media/videos/.gitkeep
 
 # Ignore output folder containing:
-#   - /{model_name}/{object}-distance-{lighting}/: contains annotated frames
-#   - /{model_name}/{model_name}_eval.xlsx: excel file with output result
-outputs/
-
+#   - /{model_name}/{object}-distance-{lighting}/: contains annotated frames (auto-generated)
+#   - /{model_name}/{model_name}_eval.xlsx: excel file with output result (auto-generated)
+outputs/*
+!outputs/.gitkeep
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
